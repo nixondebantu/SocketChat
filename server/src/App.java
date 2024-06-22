@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class App {
     static Connection connection = null;
@@ -52,15 +54,32 @@ public class App {
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-                // Read email and password from the client
-                String email = in.readLine();
-                String password = in.readLine();
+                // Read the type of request
+                String requestType = in.readLine();
 
-                // Validate credentials
-                String userData = validateLogin(email, password);
+                if ("login".equals(requestType)) {
+                    // Read email and password from the client
+                    String email = in.readLine();
+                    String password = in.readLine();
 
-                // Send the result back to the client
-                out.println(userData != null ? userData : "null");
+                    // Validate credentials
+                    String userData = validateLogin(email, password);
+
+                    // Send the result back to the client
+                    out.println(userData != null ? userData : "null");
+                } else if ("fetchUserList".equals(requestType)) {
+                    // Read UID from the client
+                    String uidStr = in.readLine();
+                    int uid = Integer.parseInt(uidStr);
+
+                    // Fetch the user list
+                    List<String> userList = fetchUserList(uid);
+
+                    // Send the user list back to the client
+                    for (String user : userList) {
+                        out.println(user);
+                    }
+                }
 
                 clientSocket.close();
             } catch (IOException e) {
@@ -86,5 +105,24 @@ public class App {
             }
             return null;
         }
+
+        private List<String> fetchUserList(int uid) {
+            List<String> userList = new ArrayList<>();
+            try {
+                String query = "SELECT username FROM users WHERE uid <> ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, uid);
+                ResultSet resultSet = statement.executeQuery();
+
+                while (resultSet.next()) {
+                    String username = resultSet.getString("username");
+                    userList.add(username);
+                }
+            } catch (Exception e) {
+                System.out.println("Error fetching user list: " + e.getMessage());
+            }
+            return userList;
+        }
+
     }
 }

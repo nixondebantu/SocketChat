@@ -24,6 +24,17 @@ CREATE TABLE users (
 INSERT INTO users (username, usermail, userpass)
 VALUES
     ('Nixon', 'nixondebantu@gmail.com', '123456'),
-    ('Antu', 'nixon2002@gmail.com', '123456');
+    ('Antu', 'nixon2002@gmail.com', '123456'),
+	('CharUser', 'aaa', '123'),
+	('INT User', '123', '123');
 
 SELECT * FROM users;
+
+CREATE TABLE chats (
+    chat_id SERIAL PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    message TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+

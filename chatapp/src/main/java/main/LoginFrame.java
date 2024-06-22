@@ -124,6 +124,7 @@ public class LoginFrame extends AppFrame implements ActionListener {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
                 // Send email and password to the server
+                out.println("login");
                 out.println(email);
                 out.println(password);
 
